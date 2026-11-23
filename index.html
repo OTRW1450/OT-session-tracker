@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob: data:; media-src 'self' blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>OT Progress Tracker</title>
+  <meta name="description" content="Score occupational therapy goals after each session and see progress over time. Data stays on this device.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f5f6f3" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#161816" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="OT Progress">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <div class="topbar-row">
+      <h1 class="brand">OT Progress</h1>
+      <label class="child-picker">
+        <span class="visually-hidden">Current child</span>
+        <select id="childSelect"></select>
+      </label>
+      <div class="topbar-actions">
+        <button type="button" class="btn btn-small" data-action="open-children">Children</button>
+        <button type="button" class="btn btn-small" data-action="open-data">Backup</button>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button type="button" class="tab" role="tab" id="tabbtn-score" aria-controls="tab-score" data-tab="score">Score session</button>
+      <button type="button" class="tab" role="tab" id="tabbtn-goals" aria-controls="tab-goals" data-tab="goals">Goals</button>
+      <button type="button" class="tab" role="tab" id="tabbtn-progress" aria-controls="tab-progress" data-tab="progress">Progress</button>
+    </nav>
+  </header>
+
+  <p id="saveStatus" class="save-status" role="status" aria-live="polite"></p>
+
+  <main id="main" tabindex="-1">
+    <section class="panel" id="tab-score" role="tabpanel" aria-labelledby="tabbtn-score"></section>
+    <section class="panel" id="tab-goals" role="tabpanel" aria-labelledby="tabbtn-goals" hidden></section>
+    <section class="panel" id="tab-progress" role="tabpanel" aria-labelledby="tabbtn-progress" hidden></section>
+  </main>
+
+  <footer class="footer no-print">
+    <p>Data stays on this device. No accounts, no tracking. Back up regularly.</p>
+  </footer>
+
+  <dialog id="sheet" class="sheet" aria-labelledby="sheetTitle">
+    <div class="sheet-head">
+      <h2 id="sheetTitle"></h2>
+      <button type="button" class="btn btn-small" data-action="close-sheet">Close</button>
+    </div>
+    <div id="sheetBody" class="sheet-body"></div>
+  </dialog>
+
+  <dialog id="lightbox" class="lightbox" aria-label="Enlarged photo">
+    <img id="lightboxImg" alt="Enlarged photo">
+    <button type="button" class="btn btn-small lightbox-close">Close</button>
+  </dialog>
+
+  <noscript><p class="card">This app needs JavaScript turned on.</p></noscript>
+
+  <script src="js/logic.js"></script>
+  <script src="js/media.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
