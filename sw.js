@@ -3,7 +3,7 @@
  * Caches only the app's own files. Network-first, so updates arrive when online;
  * falls back to the cache when offline. Never caches or sends any user data.
  */
-const CACHE = 'ot-tracker-v1';
+const CACHE = 'ot-tracker-v2';
 const FILES = [
   './', './index.html', './css/styles.css', './js/logic.js', './js/media.js', './js/app.js',
   './manifest.webmanifest', './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png',

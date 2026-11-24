@@ -12,7 +12,7 @@
   const STORE_KEY = 'otProgressTracker.v2';
   const DRAFT_KEY = 'otProgressTracker.drafts.v2';
   const UI_KEY = 'otProgressTracker.ui.v2';
-  const CONFIRM_MS = 4000;
+  const CONFIRM_MS = 6000;
 
   const $ = (sel, root) => (root || document).querySelector(sel);
   const $$ = (sel, root) => Array.from((root || document).querySelectorAll(sel));
@@ -959,8 +959,12 @@
       const p = sheet.pending;
       html += '<div class="restore-confirm" role="alert"><p>Ready to restore <strong>' + esc(sheet.pendingSource) + '</strong>: ' +
         esc(plural(p.children.length, 'child', 'children') + ', ' + plural(p.goals.length, 'goal') + ', ' + plural(p.sessions.length, 'session')) + '.</p>' +
-        '<div class="btn-row">' + confirmBtn('do-restore', '', 'Replace my data with this backup', 'Tap again to replace all data', 'btn-danger') +
-        '<button type="button" class="btn" data-action="cancel-restore">Cancel</button></div></div>';
+        (sheet.confirmRestore
+          ? '<p><strong>Are you sure?</strong> Everything currently in the app on this device will be replaced by this backup.</p>' +
+            '<div class="btn-row"><button type="button" class="btn btn-danger" id="confirmRestoreBtn" data-action="do-restore">Yes, replace everything</button>' +
+            '<button type="button" class="btn" data-action="cancel-restore">Cancel</button></div></div>'
+          : '<div class="btn-row"><button type="button" class="btn btn-danger" data-action="ask-restore">Replace my data with this backup</button>' +
+            '<button type="button" class="btn" data-action="cancel-restore">Cancel</button></div></div>');
     }
     return html;
   }
@@ -999,7 +1003,8 @@
   }
 
   function prepareRestore(text, source) {
-    sheet.pending = null; sheet.restoreError = '';
+    sheet.pending = null; sheet.restoreError = ''; sheet.confirmRestore = false;
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); // close the iPad keyboard
     try {
       sheet.pending = L.normalizeState(text);
       sheet.pendingSource = source;
@@ -1007,6 +1012,17 @@
       sheet.restoreError = e.message || 'Could not read that backup.';
     }
     renderSheet();
+    revealRestorePanel();
+  }
+
+  /** Scroll the restore result into view once the on-screen keyboard has closed. */
+  function revealRestorePanel(focusSel) {
+    setTimeout(() => {
+      const el = $('#sheet .restore-confirm') || $('#sheet .form-error');
+      if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      const f = focusSel && $(focusSel);
+      if (f) f.focus({ preventScroll: true });
+    }, 350);
   }
 
   function doRestore() {
@@ -1069,6 +1085,8 @@
   function needsConfirm(btn) {
     if (!btn.dataset.confirm) return false;
     if (btn.dataset.armed === '1') return false;
+    const ae = document.activeElement;
+    if (ae && ae !== btn && /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)) ae.blur();
     btn.dataset.armed = '1';
     btn.dataset.label = btn.textContent;
     btn.textContent = btn.dataset.confirm;
@@ -1141,7 +1159,8 @@
     'show-backup-text': () => { sheet.showText = !sheet.showText; renderSheet(); const t = $('#backupText'); if (t) t.focus(); },
     'copy-backup': copyBackup,
     'check-restore-text': () => { sheet.pasteText = $('#restoreText').value; prepareRestore(sheet.pasteText, 'pasted text'); },
-    'cancel-restore': () => { sheet.pending = null; renderSheet(); },
+    'ask-restore': () => { sheet.confirmRestore = true; renderSheet(); revealRestorePanel('#confirmRestoreBtn'); },
+    'cancel-restore': () => { sheet.pending = null; sheet.confirmRestore = false; renderSheet(); },
     'do-restore': doRestore,
     'close-sheet': closeSheet,
   };
